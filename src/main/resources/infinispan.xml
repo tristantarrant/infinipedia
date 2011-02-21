@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<infinispan xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:infinispan:config:5.0 http://www.infinispan.org/schemas/infinispan-config-4.2.xsd"
+	xmlns="urn:infinispan:config:5.0">
+
+	<global>
+		<transport clusterName="infiniCluster" strictPeerToPeer="true">
+			<properties>
+				<property name="configurationFile" value="infinispan-jgroups.xml" />
+				<property name="channelLookup" value="net.dataforte.infinispan.amanuensis.backend.jgroups.MuxChannelLookup" />
+			</properties>
+		</transport>
+	</global>
+	
+	<default>
+		<transaction transactionManagerLookupClass="org.infinispan.transaction.lookup.DummyTransactionManagerLookup"/>
+	</default>
+	
+	<namedCache name="volatileCache">
+		<invocationBatching enabled="true" />
+		<clustering mode="repl" />
+		<jmxStatistics enabled="true"/>
+	</namedCache>
+
+	<namedCache name="metadataCache">
+		<eviction strategy="NONE" />
+		<invocationBatching enabled="true" />
+		<clustering mode="repl" />
+		<jmxStatistics enabled="true"/>
+		<loaders passivation="false" shared="false" preload="false">
+			<loader class="org.infinispan.loaders.file.FileCacheStore" fetchPersistentState="false" ignoreModifications="false"
+				purgeOnStartup="false">
+				<properties>
+					<property name="location" value="${infinipedia.data.path}"/>
+				</properties>
+			</loader>			
+		</loaders>
+	</namedCache>
+
+	<namedCache name="chunksCache">
+		<eviction strategy="LIRS" maxEntries="1000" />
+		<invocationBatching enabled="true" />
+		<clustering mode="dist">
+			<l1 enabled="false"/>
+			<hash numOwners="2" rehashEnabled="true"/>
+		</clustering>
+		<jmxStatistics enabled="true"/>
+		<loaders passivation="false" shared="false" preload="false">
+			<loader class="org.infinispan.loaders.file.FileCacheStore" fetchPersistentState="false" ignoreModifications="false"
+				purgeOnStartup="false">
+				<properties>
+					<property name="location" value="${infinipedia.data.path}"/>
+				</properties>
+			</loader>			
+		</loaders>
+	</namedCache>
+
+	<namedCache name="dataCache">
+		<eviction strategy="LIRS" maxEntries="1000" />
+		<invocationBatching enabled="true" />
+		<clustering mode="dist">
+			<l1 enabled="false"/>
+			<hash numOwners="2" rehashEnabled="true"/>
+		</clustering>
+		<jmxStatistics enabled="true"/>
+		<loaders passivation="false" shared="false" preload="false">
+			<loader class="org.infinispan.loaders.file.FileCacheStore" fetchPersistentState="false" ignoreModifications="false"
+				purgeOnStartup="false">
+				<properties>
+					<property name="location" value="${infinipedia.data.path}"/>
+				</properties>
+			</loader>
+		</loaders>
+	</namedCache>
+
+</infinispan>
